@@ -97,18 +97,6 @@
             border-color: #667eea;
             box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
         }
-        .message-button {
-    background: white;
-    color: #667eea;
-    border: none;
-    border-radius: 20px;
-    padding: 10px 18px;
-    margin-top: 12px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
 
         .month-card.available {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
@@ -168,7 +156,6 @@
                 Planning 2026
             </h1>
             <p>JULES VERNE - Tous les mois</p>
-            <button class="message-button" onclick="activerNotifications()">💬 Activer les notifications</button>
         </div>
 
         <div class="content">
@@ -322,33 +309,7 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js"></script>
-<script>
-    // Configuration Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyAHCaxEDHOcpSXnpM4Yf2CXBEhtPCIi5v8",
-  authDomain: "planning-jules-verne.firebaseapp.com",
-  projectId: "planning-jules-verne",
-  storageBucket: "planning-jules-verne.firebasestorage.app",
-  messagingSenderId: "744305361223",
-  appId: "1:744305361223:web:3f276e3dfaf12632044c62"
-};
-
-firebase.initializeApp(firebaseConfig);
-const messaging = firebase.messaging();
-    // Demander l'autorisation pour les notifications
-Notification.requestPermission().then((permission) => {
-    if (permission === 'granted') {
-        messaging.getToken({
-            vapidKey: 'BBTqsxxeeDAME3aqS6Jqeq_S1BuGZ04c0L3OuaVrJqWBdPr02eP3pUlfInjldCmZ35nf_F4i90-_KxhPsv51QFk'
-        }).then((token) => {
-            console.log('Token FCM :', token);
-        }).catch((error) => {
-            console.error('Erreur récupération token :', error);
-        });
-    }
-});
+    <script>
         // Service Worker pour PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js').catch(()=>{});
@@ -360,30 +321,6 @@ Notification.requestPermission().then((permission) => {
             e.preventDefault();
             deferredPrompt = e;
         });
-   async function activerNotifications() {
-    try {
-        const permission = await Notification.requestPermission();
-
-        if (permission !== 'granted') {
-            alert('Notifications non autorisées.');
-            return;
-        }
-
-        const registration = await navigator.serviceWorker.register('./service-worker.js');
-
-        const token = await messaging.getToken({
-            vapidKey: 'BBTqsxxeeDAME3aqS6Jqeq_S1BuGZ04c0L3OuaVrJqWBdPr02eP3pUlfInjldCmZ35nf_F4i90-_KxhPsv51QFk',
-            serviceWorkerRegistration: registration
-        });
-
-        console.log('Token FCM :', token);
-        alert('Notifications activées !');
-
-    } catch (error) {
-        console.error('Erreur notifications :', error);
-        alert('Erreur activation notifications. Voir la console.');
-    }
-}
     </script>
 </body>
 </html>
