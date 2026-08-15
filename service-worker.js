@@ -1,8 +1,9 @@
 // Service Worker - Planning Jules Verne
 
 self.addEventListener('install', () => self.skipWaiting());
+
 self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
+  event.waitUntil(self.clients.claim());
 });
 
 // Firebase
