@@ -309,7 +309,33 @@
         </div>
     </div>
 
-    <script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js"></script>
+<script>
+    // Configuration Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAHCaxEDHOcpSXnpM4Yf2CXBEhtPCIi5v8",
+  authDomain: "planning-jules-verne.firebaseapp.com",
+  projectId: "planning-jules-verne",
+  storageBucket: "planning-jules-verne.firebasestorage.app",
+  messagingSenderId: "744305361223",
+  appId: "1:744305361223:web:3f276e3dfaf12632044c62"
+};
+
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
+    // Demander l'autorisation pour les notifications
+Notification.requestPermission().then((permission) => {
+    if (permission === 'granted') {
+        messaging.getToken({
+            vapidKey: 'BBTqsxxeeDAME3aqS6Jqeq_S1BuGZ04c0L3OuaVrJqWBdPr02eP3pUlfInjldCmZ35nf_F4i90-_KxhPsv51QFk'
+        }).then((token) => {
+            console.log('Token FCM :', token);
+        }).catch((error) => {
+            console.error('Erreur récupération token :', error);
+        });
+    }
+});
         // Service Worker pour PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js').catch(()=>{});
