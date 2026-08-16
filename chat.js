@@ -115,6 +115,16 @@ chatSend.addEventListener("click", async () => {
 });
 
 window.addEventListener("messagesPlanning", (event) => {
+    const nombreMessages = event.detail.length;
+
+if (!premiereLecture && nombreMessages > dernierNombreMessages && !chatWindow.classList.contains("open")) {
+    const nouveaux = nombreMessages - dernierNombreMessages;
+    chatBadge.textContent = nouveaux;
+    chatBadge.style.display = "block";
+}
+
+dernierNombreMessages = nombreMessages;
+premiereLecture = false;
     chatMessages.innerHTML = "";
 
    event.detail.forEach((message) => {
