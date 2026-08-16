@@ -94,6 +94,9 @@ let dernierNombreMessages = 0;
 let premiereLecture = true;
 chatBubble.addEventListener("click", () => {
     chatWindow.classList.toggle("open");
+    
+    chatBadge.style.display = "none";
+chatBadge.textContent = "0";
 
     setTimeout(() => {
         chatMessages.scrollTop = chatMessages.scrollHeight;
