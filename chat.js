@@ -91,6 +91,10 @@ const chatMessages = document.getElementById("chat-messages");
 
 chatBubble.addEventListener("click", () => {
     chatWindow.classList.toggle("open");
+
+    setTimeout(() => {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }, 100);
 });
 
 chatClose.addEventListener("click", () => {
