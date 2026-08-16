@@ -79,3 +79,50 @@ onSnapshot(q, (snapshot) => {
     );
 
 });
+// ===== INTERFACE DE LA BOITE DE DIALOGUE =====
+
+const chatBubble = document.querySelector(".chat-bubble");
+const chatWindow = document.getElementById("chat-window");
+const chatClose = document.getElementById("chat-close");
+const chatSend = document.getElementById("chat-send");
+const chatAuthor = document.getElementById("chat-author");
+const chatText = document.getElementById("chat-text");
+const chatMessages = document.getElementById("chat-messages");
+
+chatBubble.addEventListener("click", () => {
+    chatWindow.classList.toggle("open");
+});
+
+chatClose.addEventListener("click", () => {
+    chatWindow.classList.remove("open");
+});
+
+chatSend.addEventListener("click", async () => {
+    const author = chatAuthor.value.trim();
+    const text = chatText.value.trim();
+
+    if (!author || !text) return;
+
+    await window.envoyerMessage(author, text);
+    chatText.value = "";
+});
+
+window.addEventListener("messagesPlanning", (event) => {
+    chatMessages.innerHTML = "";
+
+    event.detail.forEach((message) => {
+        const ligne = document.createElement("div");
+
+        let heure = "";
+        if (message.createdAt?.toDate) {
+            heure = message.createdAt.toDate().toLocaleString("fr-FR");
+        }
+
+        ligne.textContent =
+            `${message.author} — ${heure} : ${message.text}`;
+
+        chatMessages.appendChild(ligne);
+    });
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+});
