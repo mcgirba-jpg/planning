@@ -2,6 +2,8 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
 import {
     getFirestore,
     collection,
@@ -29,7 +31,8 @@ const firebaseConfig = {
 // Initialisation Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
+const auth = getAuth(app);
+const utilisateurConnecte = () => auth.currentUser;
 
 // Collection Firestore
 const messagesRef = collection(db, "messages");
@@ -45,6 +48,7 @@ window.envoyerMessage = async function(author, text) {
 
         await addDoc(messagesRef, {
             author: author,
+            uid: utilisateurConnecte()?.uid || "",
             text: text.trim(),
             createdAt: serverTimestamp()
         });
@@ -166,7 +170,9 @@ supprimer.addEventListener("click", async () => {
     }
 });
 
-ligne.appendChild(supprimer);
+if (utilisateurConnecte()?.uid === message.uid) {
+    ligne.appendChild(supprimer);
+}
 ligne.appendChild(auteur);
 ligne.appendChild(texte);
 chatMessages.appendChild(ligne);
