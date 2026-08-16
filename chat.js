@@ -126,3 +126,13 @@ window.addEventListener("messagesPlanning", (event) => {
 
     chatMessages.scrollTop = chatMessages.scrollHeight;
 });
+// ===== MEMORISER LES INITIALES =====
+const initialesSauvees = localStorage.getItem("planningInitiales");
+
+if (initialesSauvees) {
+    chatAuthor.value = initialesSauvees;
+}
+
+chatAuthor.addEventListener("input", () => {
+    localStorage.setItem("planningInitiales", chatAuthor.value.trim().toUpperCase());
+});
