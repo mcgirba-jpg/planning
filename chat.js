@@ -110,19 +110,27 @@ chatSend.addEventListener("click", async () => {
 window.addEventListener("messagesPlanning", (event) => {
     chatMessages.innerHTML = "";
 
-    event.detail.forEach((message) => {
-        const ligne = document.createElement("div");
+   event.detail.forEach((message) => {
+    const ligne = document.createElement("div");
+    ligne.className = "message-bubble";
 
-        let heure = "";
-        if (message.createdAt?.toDate) {
-            heure = message.createdAt.toDate().toLocaleString("fr-FR");
-        }
+    let heure = "";
+    if (message.createdAt?.toDate) {
+        heure = message.createdAt.toDate().toLocaleString("fr-FR");
+    }
 
-        ligne.textContent =
-            `${message.author} — ${heure} : ${message.text}`;
+    const auteur = document.createElement("div");
+    auteur.className = "message-author";
+    auteur.textContent = `${message.author || "?"} • ${heure}`;
 
-        chatMessages.appendChild(ligne);
-    });
+    const texte = document.createElement("div");
+    texte.className = "message-text";
+    texte.textContent = message.text || "";
+
+    ligne.appendChild(auteur);
+    ligne.appendChild(texte);
+    chatMessages.appendChild(ligne);
+});
 
     chatMessages.scrollTop = chatMessages.scrollHeight;
 });
