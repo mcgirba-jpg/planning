@@ -89,6 +89,9 @@ const chatAuthor = document.getElementById("chat-author");
 const chatText = document.getElementById("chat-text");
 const chatMessages = document.getElementById("chat-messages");
 
+const chatBadge = document.getElementById("chat-badge");
+let dernierNombreMessages = 0;
+let premiereLecture = true;
 chatBubble.addEventListener("click", () => {
     chatWindow.classList.toggle("open");
 
