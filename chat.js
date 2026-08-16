@@ -170,7 +170,12 @@ supprimer.addEventListener("click", async () => {
     }
 });
 
-if (utilisateurConnecte()?.uid === message.uid) {
+const UID_ADMIN = "zrYbWdxl4xW4qhkflC6K9CUJq4X2";
+
+if (
+    utilisateurConnecte()?.uid === message.uid ||
+    utilisateurConnecte()?.uid === UID_ADMIN
+) {
     ligne.appendChild(supprimer);
 }
 ligne.appendChild(auteur);
