@@ -145,13 +145,31 @@ premiereLecture = false;
     auteur.className = "message-author";
     auteur.textContent = `${message.author || "?"} • ${heure}`;
 
-    const texte = document.createElement("div");
-    texte.className = "message-text";
-    texte.textContent = message.text || "";
+  const texte = document.createElement("div");
+texte.className = "message-text";
+texte.textContent = message.text || "";
 
-    ligne.appendChild(auteur);
-    ligne.appendChild(texte);
-    chatMessages.appendChild(ligne);
+const supprimer = document.createElement("button");
+supprimer.textContent = "🗑️";
+supprimer.title = "Supprimer ce message";
+supprimer.style.cssText = "float:right;border:none;background:transparent;cursor:pointer;font-size:16px;";
+
+supprimer.addEventListener("click", async () => {
+    const confirmation = confirm("Supprimer ce message ?");
+    if (!confirmation) return;
+
+    try {
+        await deleteDoc(doc(db, "messages", message.id));
+    } catch (erreur) {
+        console.error("Erreur suppression :", erreur);
+        alert("Impossible de supprimer le message.");
+    }
+});
+
+ligne.appendChild(supprimer);
+ligne.appendChild(auteur);
+ligne.appendChild(texte);
+chatMessages.appendChild(ligne);
 });
 
     chatMessages.scrollTop = chatMessages.scrollHeight;
