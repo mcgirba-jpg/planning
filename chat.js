@@ -3,14 +3,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
 import {
-    getAuth,
-    onAuthStateChanged,
-    signInWithEmailAndPassword,
-    setPersistence,
-    browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
-import {
     getFirestore,
     collection,
     addDoc,
@@ -35,21 +27,12 @@ const firebaseConfig = {
 };
 
 
-// ===== INITIALISATION =====
+// ===== INITIALISATION FIREBASE =====
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
 
-// Conserver la connexion Firebase sur cet appareil
-setPersistence(auth, browserLocalPersistence)
-    .catch((error) => {
-        console.error("Erreur persistance Firebase :", error);
-    });
-
-const UID_ADMIN = "zrYbWdxl4xW4qhkflC6K9CUJq4X2";
-
-let utilisateurActuel = null;
+const messagesRef = collection(db, "messages");
 
 
 // ===== ELEMENTS DE L'INTERFACE =====
@@ -66,14 +49,19 @@ const chatBadge = document.getElementById("chat-badge");
 
 // ===== MEMORISER LES INITIALES =====
 
-const initialesSauvees = localStorage.getItem("planningInitiales");
+const initialesSauvees =
+    localStorage.getItem("planningInitiales");
 
 if (initialesSauvees) {
     chatAuthor.value = initialesSauvees;
 }
 
 chatAuthor.addEventListener("input", () => {
-    const initiales = chatAuthor.value.trim().toUpperCase();
+
+    const initiales =
+        chatAuthor.value
+            .trim()
+            .toUpperCase();
 
     chatAuthor.value = initiales;
 
@@ -84,44 +72,29 @@ chatAuthor.addEventListener("input", () => {
 });
 
 
-// ===== AUTHENTIFICATION =====
-
-onAuthStateChanged(auth, (user) => {
-
-    utilisateurActuel = user;
-
-    // Redessine les messages lorsque Firebase
-    // a fini de restaurer l'utilisateur connecté.
-    afficherMessages(derniersMessages);
-
-});
-
-
-// ===== COLLECTION FIRESTORE =====
-
-const messagesRef = collection(db, "messages");
-
-
 // ===== ENVOYER UN MESSAGE =====
 
 async function envoyerMessage() {
 
-    const author = chatAuthor.value.trim().toUpperCase();
-    const text = chatText.value.trim();
+    const author =
+        chatAuthor.value
+            .trim()
+            .toUpperCase();
+
+    const text =
+        chatText.value.trim();
 
     if (!author || !text) {
         return;
     }
+
+    chatSend.disabled = true;
 
     try {
 
         await addDoc(messagesRef, {
 
             author: author,
-
-            uid: utilisateurActuel
-                ? utilisateurActuel.uid
-                : "",
 
             text: text,
 
@@ -130,6 +103,8 @@ async function envoyerMessage() {
         });
 
         chatText.value = "";
+
+        chatText.focus();
 
     } catch (error) {
 
@@ -141,6 +116,10 @@ async function envoyerMessage() {
         alert(
             "Impossible d'envoyer le message."
         );
+
+    } finally {
+
+        chatSend.disabled = false;
     }
 }
 
@@ -172,7 +151,7 @@ chatText.addEventListener(
 );
 
 
-// ===== OUVRIR / FERMER LE CHAT =====
+// ===== OUVRIR LA MESSAGERIE =====
 
 chatBubble.addEventListener(
     "click",
@@ -184,8 +163,9 @@ chatBubble.addEventListener(
             chatWindow.classList.contains("open")
         ) {
 
-            chatBadge.style.display = "none";
+            // Remet le compteur à zéro
             chatBadge.textContent = "0";
+            chatBadge.style.display = "none";
 
             setTimeout(() => {
 
@@ -198,23 +178,27 @@ chatBubble.addEventListener(
 );
 
 
+// ===== FERMER LA MESSAGERIE =====
+
 chatClose.addEventListener(
     "click",
-    () => {
+    (event) => {
+
+        event.stopPropagation();
 
         chatWindow.classList.remove("open");
-
     }
 );
 
 
-// ===== MESSAGES EN TEMPS REEL =====
+// ===== GESTION DES MESSAGES NON LUS =====
 
-let derniersMessages = [];
+let premiereLecture = true;
 
 let idsConnus = new Set();
 
-let premiereLecture = true;
+
+// ===== RECEPTION TEMPS REEL FIRESTORE =====
 
 const q = query(
     messagesRef,
@@ -230,49 +214,62 @@ onSnapshot(
 
         const messages = [];
 
-        snapshot.forEach((documentSnapshot) => {
+        snapshot.forEach(
+            (documentSnapshot) => {
 
-            messages.push({
+                messages.push({
 
-                id: documentSnapshot.id,
+                    id: documentSnapshot.id,
 
-                ...documentSnapshot.data()
+                    ...documentSnapshot.data()
 
-            });
-        });
+                });
+            }
+        );
 
 
-        // ===== BADGE NOUVEAUX MESSAGES =====
+        // ===== DETECTER LES NOUVEAUX MESSAGES =====
 
         if (!premiereLecture) {
 
             let nouveaux = 0;
 
-            messages.forEach((message) => {
+            messages.forEach(
+                (message) => {
 
-                if (!idsConnus.has(message.id)) {
+                    if (
+                        !idsConnus.has(message.id)
+                    ) {
 
-                    nouveaux++;
-
+                        nouveaux++;
+                    }
                 }
-            });
+            );
 
+
+            // Afficher le badge seulement
+            // si la messagerie est fermée
 
             if (
                 nouveaux > 0 &&
                 !chatWindow.classList.contains("open")
             ) {
 
-                const ancienNombre =
-                    Number(chatBadge.textContent) || 0;
+                const compteurActuel =
+                    Number(
+                        chatBadge.textContent
+                    ) || 0;
 
                 chatBadge.textContent =
-                    ancienNombre + nouveaux;
+                    compteurActuel + nouveaux;
 
-                chatBadge.style.display = "block";
+                chatBadge.style.display =
+                    "block";
             }
         }
 
+
+        // Mémoriser les messages actuellement connus
 
         idsConnus = new Set(
             messages.map(
@@ -282,7 +279,8 @@ onSnapshot(
 
         premiereLecture = false;
 
-        derniersMessages = messages;
+
+        // Afficher immédiatement les messages
 
         afficherMessages(messages);
 
@@ -291,10 +289,9 @@ onSnapshot(
     (error) => {
 
         console.error(
-            "Erreur temps réel Firestore :",
+            "Erreur réception Firestore :",
             error
         );
-
     }
 );
 
@@ -306,81 +303,42 @@ function afficherMessages(messages) {
     chatMessages.innerHTML = "";
 
 
-    messages.forEach((message) => {
+    messages.forEach(
+        (message) => {
 
-        const ligne =
-            document.createElement("div");
+            const ligne =
+                document.createElement("div");
 
-        ligne.className =
-            "message-bubble";
-
-
-        // ===== DATE ET HEURE =====
-
-        let heure = "";
-
-        if (message.createdAt?.toDate) {
-
-            heure =
-                message.createdAt
-                    .toDate()
-                    .toLocaleString(
-                        "fr-FR",
-                        {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit"
-                        }
-                    );
-        }
+            ligne.className =
+                "message-bubble";
 
 
-        // ===== AUTEUR =====
+            // ===== DATE ET HEURE =====
 
-        const auteur =
-            document.createElement("div");
+            let dateHeure = "";
 
-        auteur.className =
-            "message-author";
+            if (
+                message.createdAt &&
+                typeof message.createdAt.toDate === "function"
+            ) {
 
-        auteur.textContent =
-            `${message.author || "?"} • ${heure}`;
+                dateHeure =
+                    message.createdAt
+                        .toDate()
+                        .toLocaleString(
+                            "fr-FR",
+                            {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            }
+                        );
+            }
 
 
-        // ===== TEXTE =====
-
-        const texte =
-            document.createElement("div");
-
-        texte.className =
-            "message-text";
-
-        texte.textContent =
-            message.text || "";
-
-
-        // ===== SUPPRESSION =====
-
-       const uidConnecte = auth.currentUser?.uid || utilisateurActuel?.uid || "";
-
-const estAuteur =
-    message.uid &&
-    uidConnecte === message.uid;
-
-const estAdmin =
-    uidConnecte === UID_ADMIN;
-
-console.log(
-    "Message :", message.author,
-    "UID message :", message.uid,
-    "UID connecté :", uidConnecte,
-    "Auteur :", estAuteur,
-    "Admin :", estAdmin
-);
-
-if (estAuteur || estAdmin) {
+            // ===== POUBELLE =====
 
             const supprimer =
                 document.createElement("button");
@@ -395,10 +353,19 @@ if (estAuteur || estAdmin) {
             supprimer.className =
                 "message-delete";
 
+            // Style de secours si la classe
+            // n'est pas encore définie dans index.html
+
+            supprimer.style.cssText =
+                "float:right;border:none;background:transparent;" +
+                "cursor:pointer;font-size:16px;padding:2px 4px;";
+
 
             supprimer.addEventListener(
                 "click",
-                async () => {
+                async (event) => {
+
+                    event.stopPropagation();
 
                     const confirmation =
                         confirm(
@@ -408,7 +375,6 @@ if (estAuteur || estAdmin) {
                     if (!confirmation) {
                         return;
                     }
-
 
                     try {
 
@@ -435,22 +401,46 @@ if (estAuteur || estAdmin) {
             );
 
 
-            ligne.appendChild(
-                supprimer
-            );
+            // ===== AUTEUR =====
+
+            const auteur =
+                document.createElement("div");
+
+            auteur.className =
+                "message-author";
+
+            auteur.textContent =
+                `${message.author || "?"}` +
+                `${dateHeure ? " • " + dateHeure : ""}`;
+
+
+            // ===== TEXTE =====
+
+            const texte =
+                document.createElement("div");
+
+            texte.className =
+                "message-text";
+
+            texte.textContent =
+                message.text || "";
+
+
+            // ===== CONSTRUIRE LE MESSAGE =====
+
+            ligne.appendChild(supprimer);
+
+            ligne.appendChild(auteur);
+
+            ligne.appendChild(texte);
+
+            chatMessages.appendChild(ligne);
         }
+    );
 
 
-        ligne.appendChild(auteur);
-
-        ligne.appendChild(texte);
-
-        chatMessages.appendChild(ligne);
-
-    });
-
-
-    // ===== DESCENDRE AU DERNIER MESSAGE =====
+    // Si la fenêtre est ouverte,
+    // afficher automatiquement le dernier message
 
     if (
         chatWindow.classList.contains("open")
@@ -460,7 +450,6 @@ if (estAuteur || estAdmin) {
 
             chatMessages.scrollTop =
                 chatMessages.scrollHeight;
-
         });
     }
 }
