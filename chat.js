@@ -354,17 +354,24 @@ function afficherMessages(messages) {
 
         // ===== SUPPRESSION =====
 
-        const estAuteur =
-            utilisateurActuel &&
-            message.uid &&
-            utilisateurActuel.uid === message.uid;
+       const uidConnecte = auth.currentUser?.uid || utilisateurActuel?.uid || "";
 
-        const estAdmin =
-            utilisateurActuel &&
-            utilisateurActuel.uid === UID_ADMIN;
+const estAuteur =
+    message.uid &&
+    uidConnecte === message.uid;
 
+const estAdmin =
+    uidConnecte === UID_ADMIN;
 
-        if (estAuteur || estAdmin) {
+console.log(
+    "Message :", message.author,
+    "UID message :", message.uid,
+    "UID connecté :", uidConnecte,
+    "Auteur :", estAuteur,
+    "Admin :", estAdmin
+);
+
+if (estAuteur || estAdmin) {
 
             const supprimer =
                 document.createElement("button");
