@@ -47,6 +47,24 @@ const chatMessages = document.getElementById("chat-messages");
 const chatBadge = document.getElementById("chat-badge");
 
 
+// ===== VERIFICATION DES ELEMENTS =====
+
+if (
+    !chatBubble ||
+    !chatWindow ||
+    !chatClose ||
+    !chatSend ||
+    !chatAuthor ||
+    !chatText ||
+    !chatMessages ||
+    !chatBadge
+) {
+    console.error(
+        "Erreur : un ou plusieurs éléments du chat sont absents de index.html"
+    );
+}
+
+
 // ===== MEMORISER LES INITIALES =====
 
 const initialesSauvees =
@@ -93,17 +111,12 @@ async function envoyerMessage() {
     try {
 
         await addDoc(messagesRef, {
-
             author: author,
-
             text: text,
-
             createdAt: serverTimestamp()
-
         });
 
         chatText.value = "";
-
         chatText.focus();
 
     } catch (error) {
@@ -163,7 +176,7 @@ chatBubble.addEventListener(
             chatWindow.classList.contains("open")
         ) {
 
-            // Remet le compteur à zéro
+            // Effacer le compteur de messages non lus
             chatBadge.textContent = "0";
             chatBadge.style.display = "none";
 
@@ -184,6 +197,7 @@ chatClose.addEventListener(
     "click",
     (event) => {
 
+        event.preventDefault();
         event.stopPropagation();
 
         chatWindow.classList.remove("open");
@@ -218,11 +232,8 @@ onSnapshot(
             (documentSnapshot) => {
 
                 messages.push({
-
                     id: documentSnapshot.id,
-
                     ...documentSnapshot.data()
-
                 });
             }
         );
@@ -237,18 +248,15 @@ onSnapshot(
             messages.forEach(
                 (message) => {
 
-                    if (
-                        !idsConnus.has(message.id)
-                    ) {
-
+                    if (!idsConnus.has(message.id)) {
                         nouveaux++;
                     }
                 }
             );
 
 
-            // Afficher le badge seulement
-            // si la messagerie est fermée
+            // Afficher le badge uniquement
+            // lorsque la messagerie est fermée
 
             if (
                 nouveaux > 0 &&
@@ -256,20 +264,17 @@ onSnapshot(
             ) {
 
                 const compteurActuel =
-                    Number(
-                        chatBadge.textContent
-                    ) || 0;
+                    Number(chatBadge.textContent) || 0;
 
                 chatBadge.textContent =
                     compteurActuel + nouveaux;
 
-                chatBadge.style.display =
-                    "block";
+                chatBadge.style.display = "block";
             }
         }
 
 
-        // Mémoriser les messages actuellement connus
+        // Mémoriser les messages connus
 
         idsConnus = new Set(
             messages.map(
@@ -280,11 +285,11 @@ onSnapshot(
         premiereLecture = false;
 
 
-        // Afficher immédiatement les messages
+        // Affichage immédiat
 
         afficherMessages(messages);
-
     },
+
 
     (error) => {
 
@@ -309,8 +314,7 @@ function afficherMessages(messages) {
             const ligne =
                 document.createElement("div");
 
-            ligne.className =
-                "message-bubble";
+            ligne.className = "message-bubble";
 
 
             // ===== DATE ET HEURE =====
@@ -338,33 +342,49 @@ function afficherMessages(messages) {
             }
 
 
-            // ===== POUBELLE =====
+            // ===== BOUTON POUBELLE =====
 
             const supprimer =
                 document.createElement("button");
 
             supprimer.type = "button";
-
             supprimer.textContent = "🗑️";
 
             supprimer.title =
                 "Supprimer ce message";
 
+            supprimer.setAttribute(
+                "aria-label",
+                "Supprimer ce message"
+            );
+
             supprimer.className =
                 "message-delete";
 
-            // Style de secours si la classe
-            // n'est pas encore définie dans index.html
+
+            // Style de secours :
+            // permet de voir la poubelle même si
+            // le CSS index.html n'est pas correct.
 
             supprimer.style.cssText =
-                "float:right;border:none;background:transparent;" +
-                "cursor:pointer;font-size:16px;padding:2px 4px;";
+                "float:right;" +
+                "border:none;" +
+                "background:transparent;" +
+                "cursor:pointer;" +
+                "font-size:18px;" +
+                "padding:2px 5px;" +
+                "margin-left:8px;" +
+                "position:relative;" +
+                "z-index:10;";
 
+
+            // ===== SUPPRESSION DU MESSAGE =====
 
             supprimer.addEventListener(
                 "click",
                 async (event) => {
 
+                    event.preventDefault();
                     event.stopPropagation();
 
                     const confirmation =
@@ -377,6 +397,8 @@ function afficherMessages(messages) {
                     }
 
                     try {
+
+                        supprimer.disabled = true;
 
                         await deleteDoc(
                             doc(
@@ -396,6 +418,8 @@ function afficherMessages(messages) {
                         alert(
                             "Impossible de supprimer le message."
                         );
+
+                        supprimer.disabled = false;
                     }
                 }
             );
@@ -429,9 +453,7 @@ function afficherMessages(messages) {
             // ===== CONSTRUIRE LE MESSAGE =====
 
             ligne.appendChild(supprimer);
-
             ligne.appendChild(auteur);
-
             ligne.appendChild(texte);
 
             chatMessages.appendChild(ligne);
@@ -439,8 +461,7 @@ function afficherMessages(messages) {
     );
 
 
-    // Si la fenêtre est ouverte,
-    // afficher automatiquement le dernier message
+    // ===== ALLER AU DERNIER MESSAGE =====
 
     if (
         chatWindow.classList.contains("open")
