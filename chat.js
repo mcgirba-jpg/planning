@@ -41,6 +41,12 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// Conserver la connexion Firebase sur cet appareil
+setPersistence(auth, browserLocalPersistence)
+    .catch((error) => {
+        console.error("Erreur persistance Firebase :", error);
+    });
+
 const UID_ADMIN = "zrYbWdxl4xW4qhkflC6K9CUJq4X2";
 
 let utilisateurActuel = null;
