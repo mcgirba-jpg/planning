@@ -1,208 +1,162 @@
-# 📅 Planning 2026 - Application React
+# Planning Jules Verne 2026
 
-Application web interactive pour gérer et visualiser les plannings de 2026 pour Mihaela Boulu.
+Application web / PWA destinée à faciliter l'accès au **planning 2026 du Centre d'Imagerie Médicale Jules Verne**.
 
-## 🎯 Fonctionnalités
+L'application est hébergée sur **GitHub Pages** et peut être utilisée sur ordinateur ou installée sur l'écran d'accueil d'un smartphone.
 
-✅ **Affichage interactif** des 12 mois + plannings additionnels  
-✅ **Recherche en temps réel** pour trouver rapidement un planning  
-✅ **Statistiques** : nombre de mois, plannings personnels, résumés annuels  
-✅ **Design moderne** avec gradient violet/bleu et animations fluides  
-✅ **Modal interactif** pour afficher les détails de chaque planning  
-✅ **Responsive** : parfait sur mobile, tablette et desktop  
-✅ **Icônes dynamiques** avec lucide-react  
-✅ **Accès direct** aux Google Sheets de chaque mois  
+## État actuel
 
-## 📦 Fichiers fournis
+**Version fonctionnelle — août 2026**
 
-### 1. **planning_app_standalone.html** (⭐ RECOMMANDÉ)
-**Version la plus simple à utiliser !**
+### Planning
 
-- ✅ Fichier HTML unique et autonome
-- ✅ Aucune installation requise
-- ✅ Double-cliquer pour ouvrir dans le navigateur
-- ✅ Tous les CDN sont inclus (React, Tailwind, Lucide)
-- ✅ Fonctionne hors ligne après chargement
+* Accès aux 12 mois du planning 2026
+* Liens vers les plannings Google Sheets
+* Utilisation sur ordinateur
+* Utilisation sur smartphone
+* Installation comme PWA depuis l'écran d'accueil
 
-**Comment utiliser :**
-```bash
-# Simplement ouvrir dans le navigateur :
-open planning_app_standalone.html
-# ou double-cliquer sur le fichier
+### Messagerie interne
+
+Une messagerie interne en temps réel est intégrée à l'application avec **Firebase Cloud Firestore**.
+
+Fonctions actuellement opérationnelles :
+
+* 💬 bouton flottant d'accès à la messagerie
+* affichage des messages en temps réel
+* envoi de messages
+* touche **Entrée** pour envoyer
+* **Maj + Entrée** pour revenir à la ligne
+* mémorisation des initiales de l'utilisateur
+* affichage de la date et de l'heure
+* défilement automatique vers les nouveaux messages
+* 🗑️ suppression des messages avec confirmation
+* ❌ fermeture de la fenêtre de messagerie
+* 🔴 badge indiquant le nombre de nouveaux messages non lus
+* remise à zéro du compteur à l'ouverture du chat
+* synchronisation en temps réel entre ordinateur et smartphone
+* fonctionnement depuis la PWA installée sur smartphone
+
+## Technologies utilisées
+
+* HTML
+* CSS
+* JavaScript
+* React / JSX
+* GitHub
+* GitHub Pages
+* PWA
+* Firebase
+* Cloud Firestore
+* Google Sheets
+
+## Structure principale
+
+```text
+index.html
+chat.js
+manifest.json
+service-worker.js
+planning_app_react.jsx
+icone-192.png
+icone-512.png
 ```
 
-### 2. **planning_app_react.jsx**
-**Pour intégration dans un projet React existant**
+## Firebase
 
-- Composant React moderne avec Hooks
-- Utilise Tailwind CSS pour le styling
-- Utilise lucide-react pour les icônes
-- Facile à customiser et étendre
+Projet Firebase :
 
-**Installation dans un projet React :**
-```bash
-# 1. Installer les dépendances
-npm install lucide-react
-
-# 2. Copier le composant dans votre projet
-# 3. Importer et utiliser :
-
-import PlanningApp from './planning_app_react.jsx';
-
-export default function App() {
-  return <PlanningApp />;
-}
+```text
+planning-jules-verne
 ```
 
-## 🎨 Design & Features
+Collection Firestore utilisée pour la messagerie :
 
-### Sections
-- **Header** : Titre, sous-titre, barre de recherche
-- **Stats** : 3 cartes affichant les statistiques clés
-- **Grille de mois** : 12 cartes pour chaque mois (3 colonnes)
-- **Plannings additionnels** : Total Annuel + MB/JR Planning (2 colonnes)
-- **Modal** : Détails + bouton d'ouverture direct
-- **Footer** : Crédits et statut
-
-### Couleurs
-- **Gradient principal** : Purple → Indigo
-- **Cartes** : Blanc avec ombres et hover effects
-- **Badges** : Violet pour les mois, Orange pour les additionnels
-- **Fond** : Gradient sombre (slate-900 → slate-800)
-
-### Interactions
-- 🔍 Recherche filtre les plannings en temps réel
-- 📌 Clic sur une carte ouvre un modal
-- 🔗 Bouton externe ouvre la Google Sheet
-- ✨ Hover effects fluides avec transitions CSS
-- 📱 Responsive : adapté à tous les écrans
-
-## 🛠️ Personnalisation
-
-### Ajouter un nouveau mois
-Éditer le tableau `planningData` dans le composant :
-
-```javascript
-planningData = [
-  // ... mois existants
-  { 
-    id: 16, 
-    name: 'Janvier 2027', 
-    type: 'month', 
-    emoji: '📅', 
-    link: 'https://docs.google.com/spreadsheets/...' 
-  },
-]
+```text
+messages
 ```
 
-### Modifier les couleurs
-Changer les classes Tailwind dans le JSX :
-- `from-purple-600 to-indigo-700` → gradient du header
-- `from-blue-500 to-purple-500` → hover des cartes mois
-- `from-orange-500 to-red-500` → hover des additionnels
-
-### Modifier le texte
-Tous les textes sont en français, faciles à trouver et modifier :
-```javascript
-<h1 className="text-3xl font-bold">Planning 2026</h1>
-<p className="text-purple-200 text-sm">Mihaela Boulu - Tous les mois</p>
-```
-
-## 📋 Dépendances
-
-### Pour la version standalone (HTML)
-- **React 18** via CDN
-- **ReactDOM 18** via CDN
-- **Babel** (JSX)
-- **Tailwind CSS 3** via CDN
-- **Lucide React** (icônes) via CDN
-
-Tous les CDN sont inclus dans le fichier HTML.
-
-### Pour la version React component
-```json
-{
-  "dependencies": {
-    "react": "^18.0.0",
-    "lucide-react": "^latest",
-    "tailwindcss": "^3.0.0"
-  }
-}
-```
-
-## 🚀 Déploiement
-
-### Option 1 : GitHub Pages (Gratuit)
-```bash
-# 1. Créer un repo GitHub
-# 2. Uploader planning_app_standalone.html
-# 3. Activer GitHub Pages dans les settings
-# 4. Accéder via https://votre-username.github.io/planning_app_standalone.html
-```
-
-### Option 2 : Netlify (Gratuit)
-```bash
-# 1. Créer un compte Netlify
-# 2. Drag & drop le fichier HTML
-# 3. Voilà ! App en ligne avec URL personnalisée
-```
-
-### Option 3 : Vercel (Gratuit pour projets React)
-```bash
-# 1. Créer un compte Vercel
-# 2. Connecter repo GitHub
-# 3. Vercel déploie automatiquement
-```
-
-## 🔧 Troubleshooting
-
-### L'app ne charge pas
-- ✅ Vérifier la connexion internet (CDN requis)
-- ✅ Essayer avec un autre navigateur
-- ✅ Vider le cache du navigateur (Ctrl+Shift+Del)
-
-### Les icônes ne s'affichent pas
-- ✅ Vérifier la connexion internet (Lucide charge depuis CDN)
-- ✅ Essayer de recharger la page
-
-### Recherche ne fonctionne pas
-- ✅ Vérifier la console (F12 > Console) pour les erreurs
-- ✅ Recharger la page
-
-## 📊 Structure des données
+Structure actuelle d'un message :
 
 ```javascript
 {
-  id: 1,                    // Identifiant unique
-  name: 'Janvier 2026',     // Nom affiché
-  type: 'month',            // 'month' | 'summary' | 'personal'
-  emoji: '📅',              // Emoji affiché
-  link: 'https://docs...'   // URL de la Google Sheet
+  author: "MB",
+  text: "Message",
+  createdAt: serverTimestamp()
 }
 ```
 
-## 💡 Futures améliorations possibles
+Les initiales de l'utilisateur sont mémorisées localement dans le navigateur :
 
-- [ ] Ajouter un calendrier interactif
-- [ ] Exporter les données en CSV/PDF
-- [ ] Synchronisation avec Google Calendar
-- [ ] Mode sombre/clair
-- [ ] Notifications de rappel
-- [ ] Gestion des préférences utilisateur
-- [ ] Multi-langue
-- [ ] Diagramme de Gantt
-- [ ] Analytics/statistiques avancées
+```javascript
+localStorage.getItem("planningInitiales")
+```
 
-## 📄 Licence
+## Temps réel
 
-Libre d'utilisation et de modification.
+La messagerie utilise un listener Firestore avec :
 
-## 👩‍💻 Support
+```javascript
+onSnapshot()
+```
 
-Besoin d'aide ? Contacter le créateur ou consulter la documentation React/Tailwind.
+Les nouveaux messages sont donc transmis automatiquement aux appareils connectés sans avoir à actualiser la page.
+
+## PWA
+
+L'application utilise notamment :
+
+```text
+manifest.json
+service-worker.js
+icone-192.png
+icone-512.png
+```
+
+Elle peut être installée sur l'écran d'accueil d'un smartphone et utilisée comme une application.
+
+## Sécurité — IMPORTANT
+
+La messagerie fonctionne actuellement **sans Firebase Authentication**.
+
+Cette décision est temporaire et a permis de stabiliser le fonctionnement du chat avant de remettre en place l'identification des utilisateurs.
+
+Les règles Firestore utilisées pendant cette phase de test sont volontairement permissives pour la collection `messages`.
+
+**Cette configuration ne doit pas être considérée comme la sécurité définitive de l'application.**
+
+## Prochaine phase
+
+La prochaine évolution concerne la **sécurisation de la messagerie**.
+
+Ordre prévu :
+
+1. mettre en place une identification fiable des utilisateurs ;
+2. conserver les initiales associées à chaque utilisateur ;
+3. attribuer un identifiant Firebase unique à chaque utilisateur ;
+4. limiter les droits d'accès à la messagerie ;
+5. limiter la suppression d'un message à son auteur et/ou à un administrateur ;
+6. remplacer les règles Firestore temporaires par des règles sécurisées ;
+7. vérifier que l'authentification reste active dans la PWA sur smartphone ;
+8. retester le temps réel, le badge et la suppression après sécurisation.
+
+## État des tests
+
+| Fonction                     | État      |
+| ---------------------------- | --------- |
+| GitHub Pages                 | ✅         |
+| Planning ordinateur          | ✅         |
+| Planning smartphone          | ✅         |
+| Installation PWA             | ✅         |
+| Envoi de messages            | ✅         |
+| Réception en temps réel      | ✅         |
+| Suppression 🗑️              | ✅         |
+| Badge messages non lus       | ✅         |
+| Compteur du badge            | ✅         |
+| Utilisation PWA smartphone   | ✅         |
+| Firebase Authentication      | ⏳ À faire |
+| Règles Firestore définitives | ⏳ À faire |
 
 ---
 
-**Développé avec ❤️ pour simplifier la gestion des plannings 2026**
-
-**Planning 2026 © Mihaela Boulu**
+**Dernière mise à jour : 19 août 2026**
